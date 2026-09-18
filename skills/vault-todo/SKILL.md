@@ -1,6 +1,6 @@
 ---
 name: vault-todo
-description: Add, list, or complete engineering to-dos in the Obsidian vault. Use when the user says "add a to-do", "what's on my list", "mark X done", "what do I still owe on <project>", or references outstanding work.
+description: Add, list, or complete engineering to-dos in the Obsidian vault. Use when the user says "add a to-do", "what's on my list", "mark X done", "what do I still owe on this project", or references outstanding work.
 allowed-tools: Bash, Read
 shell: bash
 ---
