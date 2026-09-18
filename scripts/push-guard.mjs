@@ -40,7 +40,7 @@ if (command.includes('VAULT_COPILOT_CONFIRMED_PUSH=1')) {
 }
 
 const config = readConfig();
-const guardedPaths = [config?.vaultPath, config?.orgRepoPath].filter(Boolean).map((p) => path.resolve(p));
+const guardedPaths = [config?.vaultPath, config?.sharedRepoPath].filter(Boolean).map((p) => path.resolve(p));
 
 if (guardedPaths.length === 0) {
   process.exit(0); // nothing configured yet — nothing to guard

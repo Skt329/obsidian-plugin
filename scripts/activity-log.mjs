@@ -1,7 +1,7 @@
-// PostToolUse hook (matcher: Bash). Purely informational — records vault-mutating
-// `obsidian` CLI calls to a local, gitignored activity log that vault-sync and
-// vault-standup use to draft accurate "what changed" summaries. Never blocks;
-// always exits 0.
+// PostToolUse hook. Purely informational: records what actually changed during a
+// session to a local, gitignored log that vault-sync, vault-standup, vault-report
+// and vault-review use to describe real work instead of guessing at it.
+// Never blocks, never fails a tool call, always exits 0.
 import { appendActivity } from './config.mjs';
 
 function readStdin() {
@@ -14,8 +14,9 @@ function readStdin() {
   });
 }
 
-const MUTATING = /\bobsidian\b.*\b(create|append|prepend|move|rename|delete|property:set|property:remove)\b/;
-const TASK_DONE = /\bobsidian\s+task\b.*\b(done|toggle)\b/;
+const VAULT_MUTATION = /\bobsidian\b[\s\S]*\b(create|append|prepend|move|rename|delete|property:set|property:remove|unique|daily:append|daily:prepend)\b/;
+const TASK_MUTATION = /\bobsidian\s+task\b[\s\S]*\b(done|toggle|todo|status)\b/;
+const GIT_COMMIT = /\bgit\b[\s\S]*\bcommit\b/;
 
 const raw = await readStdin();
 let payload;
@@ -25,9 +26,23 @@ try {
   process.exit(0);
 }
 
-const command = payload?.tool_input?.command;
-if (typeof command === 'string' && (MUTATING.test(command) || TASK_DONE.test(command))) {
-  appendActivity(command.slice(0, 200));
+const tool = payload?.tool_name;
+const input = payload?.tool_input ?? {};
+
+try {
+  if (tool === 'Bash' && typeof input.command === 'string') {
+    const cmd = input.command;
+    if (VAULT_MUTATION.test(cmd) || TASK_MUTATION.test(cmd)) {
+      appendActivity(`vault\t${cmd.slice(0, 200)}`);
+    } else if (GIT_COMMIT.test(cmd)) {
+      appendActivity(`commit\t${cmd.slice(0, 200)}`);
+    }
+  } else if ((tool === 'Write' || tool === 'Edit' || tool === 'NotebookEdit') && typeof input.file_path === 'string') {
+    // File paths only — never contents. The log is a memory aid, not a copy of the work.
+    appendActivity(`edit\t${tool}\t${input.file_path}`);
+  }
+} catch {
+  // A logging failure must never surface as a tool failure.
 }
 
 process.exit(0);

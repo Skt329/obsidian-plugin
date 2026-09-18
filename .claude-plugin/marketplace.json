@@ -1,17 +1,16 @@
 {
-  "name": "saurabh-personal-plugins",
-  "description": "Personal Claude Code plugins for managing an Obsidian-based engineering knowledge base.",
+  "name": "obsidian-vault-copilot-marketplace",
+  "description": "Obsidian Vault Copilot — turn any Obsidian vault into a working system for documenting work and life from your AI coding assistant.",
   "owner": {
-    "name": "Saurabh Tiwari",
-    "email": "Saurabh.Tiwari@neoaistriq.com"
+    "name": "Saurabh Tiwari"
   },
   "plugins": [
     {
       "name": "obsidian-vault-copilot",
       "displayName": "Obsidian Vault Copilot",
       "source": "./",
-      "description": "Manage a personal Obsidian vault as a software-engineering knowledge base with reviewed GitHub sync.",
-      "version": "0.1.0",
+      "description": "Notes, tasks, decisions, documentation, standups, reports, reviews, diagrams and templates in your Obsidian vault — works with the vault you already have.",
+      "version": "0.2.0",
       "license": "MIT"
     }
   ]

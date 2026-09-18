@@ -44,8 +44,11 @@ export function recentActivityLines(limit = 20) {
 function sessionEndCheck() {
   const config = readConfig();
   if (!config?.vaultPath || !existsSync(config.vaultPath)) return;
+  // git is one sync option among several. Someone using Obsidian Sync, a cloud
+  // folder, or nothing at all should never be nagged to run a git workflow.
+  if (config.syncMode && config.syncMode !== 'git') return;
   const status = statusPorcelain(config.vaultPath);
-  if (!status.ok) return;
+  if (!status.ok) return; // not a git repo — nothing to remind about
   const changed = status.stdout.split('\n').filter(Boolean).length;
   if (changed > 0) {
     console.log(

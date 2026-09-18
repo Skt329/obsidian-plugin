@@ -6,7 +6,7 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-probe.mjs\"",
-            "timeout": 15
+            "timeout": 20
           }
         ]
       }
@@ -17,14 +17,14 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/git-helpers.mjs\" session-end-check",
-            "timeout": 10
+            "timeout": 15
           }
         ]
       }
     ],
     "PostToolUse": [
       {
-        "matcher": "Bash",
+        "matcher": "Bash|Write|Edit|NotebookEdit",
         "hooks": [
           {
             "type": "command",

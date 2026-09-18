@@ -21,12 +21,20 @@ export function runObsidian(args, { cwd } = {}) {
     shell: false,
     cwd,
   });
+  const timedOut = result.error?.code === 'ETIMEDOUT' || result.signal === 'SIGTERM';
+  const notFound = result.error?.code === 'ENOENT';
   return {
     ok: result.status === 0 && !result.error,
     status: result.status,
     stdout: (result.stdout ?? '').trim(),
     stderr: (result.stderr ?? '').trim(),
     error: result.error,
+    timedOut,
+    hint: timedOut
+      ? 'The Obsidian CLI did not respond in time. It drives the running Obsidian app, which can block while starting up or checking for updates. Make sure Obsidian is open and idle, then retry.'
+      : notFound
+        ? 'The "obsidian" command was not found. Install Obsidian 1.12.7 or later and enable Settings > General > Command line interface.'
+        : null,
   };
 }
 
@@ -51,7 +59,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     const res = runObsidian(args);
     if (res.stdout) console.log(res.stdout);
     if (res.stderr) console.error(res.stderr);
-    if (res.error) console.error(res.error.message);
+    if (res.hint) console.error(`[obsidian-vault-copilot] ${res.hint}`);
+    else if (res.error) console.error(res.error.message);
     process.exitCode = res.ok ? 0 : 1;
   }
 }
