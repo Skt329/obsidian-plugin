@@ -1,0 +1,18 @@
+{
+  "name": "saurabh-personal-plugins",
+  "description": "Personal Claude Code plugins for managing an Obsidian-based engineering knowledge base.",
+  "owner": {
+    "name": "Saurabh Tiwari",
+    "email": "Saurabh.Tiwari@neoaistriq.com"
+  },
+  "plugins": [
+    {
+      "name": "obsidian-vault-copilot",
+      "displayName": "Obsidian Vault Copilot",
+      "source": "./",
+      "description": "Manage a personal Obsidian vault as a software-engineering knowledge base with reviewed GitHub sync.",
+      "version": "0.1.0",
+      "license": "MIT"
+    }
+  ]
+}

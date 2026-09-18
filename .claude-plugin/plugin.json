@@ -1,0 +1,52 @@
+{
+  "name": "obsidian-vault-copilot",
+  "displayName": "Obsidian Vault Copilot",
+  "version": "0.1.0",
+  "description": "Manage a personal Obsidian vault as a software-engineering knowledge base: decisions, to-dos, standups, manager reports, Mermaid diagrams, and reviewed GitHub sync.",
+  "author": {
+    "name": "Saurabh Tiwari",
+    "email": "Saurabh.Tiwari@neoaistriq.com"
+  },
+  "license": "MIT",
+  "keywords": [
+    "obsidian",
+    "knowledge-base",
+    "standup",
+    "documentation",
+    "git-sync",
+    "decisions"
+  ],
+  "hooks": "./hooks/hooks.json",
+  "userConfig": {
+    "vaultName": {
+      "type": "string",
+      "title": "Vault name",
+      "description": "Name of the Obsidian vault this plugin manages, as it appears in `obsidian vaults`. The authoritative copy is written to ~/.claude/obsidian-vault-copilot/config.json by /vault-setup."
+    },
+    "vaultPath": {
+      "type": "string",
+      "title": "Vault path",
+      "description": "Absolute filesystem path to the vault."
+    },
+    "githubRepoUrl": {
+      "type": "string",
+      "title": "GitHub repo URL",
+      "description": "Git remote URL for the vault's GitHub repo (private by default)."
+    },
+    "managerName": {
+      "type": "string",
+      "title": "Manager name",
+      "description": "Your manager's name, used to address status reports."
+    },
+    "timezone": {
+      "type": "string",
+      "title": "Timezone",
+      "description": "IANA timezone used for daily-note and report dating."
+    },
+    "orgRepoPath": {
+      "type": "string",
+      "title": "Org repo path",
+      "description": "Optional local clone path of a shared org knowledge repo, used by /vault-contribute."
+    }
+  }
+}
