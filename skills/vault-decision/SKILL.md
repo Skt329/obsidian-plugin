@@ -81,7 +81,7 @@ domain: <work area or life area>
 status: proposed | accepted | superseded
 date: YYYY-MM-DD
 tags: [decision, ...]
-sensitive: true | false
+sensitivity: public | internal | private
 ```
 
 Reuse an existing tag over minting a near-duplicate. Create with the wrapper:
@@ -90,11 +90,13 @@ Reuse an existing tag over minting a near-duplicate. Create with the wrapper:
 ## 6. Small decisions get small records
 
 If the choice is small — which library for a throwaway script, which dentist, which of two
-weekend plans — offer three or four lines appended to the daily note instead:
+weekend plans — offer three or four lines in the vault's dated log instead of a full record:
 
-```
-node "${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.mjs" daily:append content="..."
-```
+- If `profile.dailyNotes` is `"used"`, append to today's daily note:
+  `node "${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.mjs" daily:append content-file=<tmp.md>`
+- Otherwise append to the dated note or log the vault already uses for this area (a project's
+  updates log, for example). Never call a `daily:*` verb in a vault without daily notes — it
+  creates a stray note, and the wrapper refuses it.
 
 Do not force a full record on a small choice. Ask if you cannot tell which size it is.
 
@@ -102,16 +104,18 @@ Do not force a full record on a small choice. Ask if you cannot tell which size 
 
 - Link related decisions with `[[wikilinks]]`, then confirm with `backlinks path=<note>`.
 - Superseding an earlier decision:
-  1. `property:set path=<old> key=status value=superseded`
+  1. `property:set name=status value=superseded path=<old>`
   2. `append path=<old> content="Superseded by [[new-note]] — <one line on what changed>"`
   3. In the new note, write `Supersedes [[old-note]]`.
   History stays. A reversed decision is one of the most valuable notes in a vault.
 
 ## 8. Sensitive decisions
 
-Set `sensitive: true` when the note touches unreleased plans, security details, someone else's
-private information, money, health, or relationships. vault-share refuses to send a sensitive
-note anywhere without an explicit override. When in doubt, mark it and say you did.
+Set `sensitivity: private` when the note touches someone else's private information, money,
+health or relationships; `sensitivity: internal` for unreleased plans or security details that
+may circulate inside a team but no further. vault-share hard-stops on `private` and warns on
+`internal`. When in doubt, mark it and say you did. (If `profile.sensitivityProperty` names a
+different key, use that key.)
 
 ## 9. Close the loop
 

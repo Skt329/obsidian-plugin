@@ -52,7 +52,7 @@ Most commands accept `format=json`; use it whenever you need to parse rather tha
 - `create path=<note> content="..."` (`unique` when a name may collide)
 - `append path=<note> content="..."` / `prepend path=<note> content="..."` — prefer these over
   rewriting a whole note
-- `property:set path=<note> key=<k> value=<v>` / `property:remove`
+- `property:set name=<k> value=<v> path=<note>` / `property:remove name=<k> path=<note>`
 - `aliases path=<note>`
 
 **Organize**

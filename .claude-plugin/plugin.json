@@ -1,7 +1,7 @@
 {
   "name": "obsidian-vault-copilot",
   "displayName": "Obsidian Vault Copilot",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Turn any Obsidian vault into a working system for documenting work and life — notes, tasks, decisions, documentation, standups, reports, reviews, diagrams and templates — driven from your AI coding assistant. Works with the vault you already have.",
   "author": {
     "name": "Saurabh Tiwari"
@@ -18,7 +18,6 @@
     "templates",
     "second-brain"
   ],
-  "hooks": "./hooks/hooks.json",
   "userConfig": {
     "vaultName": {
       "type": "string",

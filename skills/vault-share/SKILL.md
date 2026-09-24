@@ -39,7 +39,12 @@ Act only on the note or excerpt the user points to. Never scan the vault decidin
 node "${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.mjs" read file="Path/To/Note.md"
 ```
 
-If frontmatter has `confidential: true` (or `private`, `sensitive`), stop and require an explicit "yes, share it anyway" before going further. A refusal here is correct behaviour, not an obstacle to route around.
+Check the privacy property — `sensitivity` unless `profile.sensitivityProperty` names another key:
+- `private` → stop. Require an explicit "yes, share it anyway" before going further.
+- `internal` → warn that it is marked internal and confirm the recipient is inside the team before continuing.
+- Legacy flags from older notes (`confidential: true`, `sensitive: true`, `private: true`) count as `private`.
+
+A refusal here is correct behaviour, not an obstacle to route around.
 
 ## 4. Mandatory review — nothing leaves the vault before this
 This runs for **both** modes, every time, including for notes that look harmless. Read the text and flag:

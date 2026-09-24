@@ -53,7 +53,7 @@ node "${CLAUDE_PLUGIN_ROOT}/scripts/vault-profile.mjs" scan
 Then place the note where similar notes already live — check with `search query="…" format=json` or `folders`. If nothing similar exists, propose one folder and ask in the same breath as confirming the capture. Never silently create a new top-level folder in someone's established vault. Naming follows `profile.namingStyle`; conventions are in `${CLAUDE_PLUGIN_ROOT}/references/conventions.md`.
 
 ## 5. Daily note or its own note
-- **Daily note** for fleeting things: a passing idea, a mood entry, an errand, a quote, "X mentioned Y". Use `daily:append content="…"` (or `daily:prepend`). If the daily note doesn't exist yet the CLI creates it.
+- **Daily note** for fleeting things — a passing idea, a mood entry, an errand, a quote, "X mentioned Y" — **only when `profile.dailyNotes` is `"used"`**. Then use `daily:append content-file=<tmp.md>`. In a vault without daily notes, put fleeting captures in the vault's existing inbox or ideas note instead; never call a `daily:*` verb there — it creates a stray daily note, and the wrapper refuses it.
 - **Its own note** for anything with a life of its own: a meeting with follow-ups, a book you'll keep adding to, a person, an article worth summarising, an idea you'll develop.
 
 State the choice in one clause and offer the other: "Appended to today's note — want it as its own note under Ideas/ instead?" A task-shaped capture goes into the vault's task home as a `- [ ]` line; if the user later wants it managed, that's vault-task, and any `ref=path:line` must be re-resolved right before mutating because line numbers shift.

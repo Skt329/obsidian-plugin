@@ -1,31 +1,33 @@
 // Shared config store for obsidian-vault-copilot.
-// Per-user state lives OUTSIDE the plugin repo entirely, so it can never be
-// accidentally committed and the same plugin works unmodified for everyone who
-// installs it. Nothing here is specific to any vault, person or workflow.
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+// Per-user state lives OUTSIDE the plugin repo, so it can never be committed and the same
+// plugin works unmodified for everyone. It deliberately does not use CLAUDE_PLUGIN_DATA: that
+// directory is deleted on uninstall, and desktop zip installs get a new id per upload, so every
+// update would wipe the user's profile.
+import { existsSync, mkdirSync, readFileSync, writeFileSync, statSync, renameSync } from 'node:fs';
 import { homedir } from 'node:os';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-export const CONFIG_DIR = path.join(homedir(), '.claude', 'obsidian-vault-copilot');
+export const CONFIG_DIR = process.env.VAULT_COPILOT_HOME || path.join(homedir(), '.claude', 'obsidian-vault-copilot');
 export const CONFIG_PATH = path.join(CONFIG_DIR, 'config.json');
-export const ACTIVITY_LOG_PATH = path.join(CONFIG_DIR, 'activity.log');
+// v0.2 wrote a tab-separated activity.log from a global hook. It is left untouched;
+// v0.2.1 writes a separate, bounded JSONL file from inside the CLI wrapper instead.
+export const ACTIVITY_LOG_PATH = path.join(CONFIG_DIR, 'activity.jsonl');
+const ACTIVITY_MAX_BYTES = 1024 * 1024;
 
-export function readConfig() {
-  if (!existsSync(CONFIG_PATH)) return null;
+// Distinguishes "no config" from "config exists but is broken". Treating both as
+// unconfigured made setup overwrite a damaged profile and silently disabled the push guard.
+export function loadConfig() {
+  if (!existsSync(CONFIG_PATH)) return { status: 'missing', config: null, error: null };
   try {
-    return JSON.parse(readFileSync(CONFIG_PATH, 'utf8'));
-  } catch {
-    return null;
+    return { status: 'ok', config: JSON.parse(readFileSync(CONFIG_PATH, 'utf8')), error: null };
+  } catch (err) {
+    return { status: 'invalid', config: null, error: err.message };
   }
 }
 
-export function requireConfig() {
-  const config = readConfig();
-  if (!config || !config.vaultName || !config.vaultPath) {
-    throw new Error('No vault configured yet. Run the vault-setup skill first.');
-  }
-  return config;
+export function readConfig() {
+  return loadConfig().config;
 }
 
 export function writeConfig(config) {
@@ -33,49 +35,72 @@ export function writeConfig(config) {
   writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2) + '\n', 'utf8');
 }
 
-export function appendActivity(line) {
-  mkdirSync(CONFIG_DIR, { recursive: true });
-  const stamp = new Date().toISOString();
-  writeFileSync(ACTIVITY_LOG_PATH, `${stamp}\t${line}\n`, { flag: 'a' });
+// One JSON object per line, so a multi-line value can never break the log. Records carry
+// identifiers and paths only — never command text or note content.
+export function formatActivity(record, now = new Date()) {
+  return JSON.stringify({ ts: now.toISOString(), ...record }) + '\n';
 }
 
-// Supports dot paths so skills can ask for one nested value, e.g. profile.folders.daily
+export function appendActivity(record) {
+  try {
+    mkdirSync(CONFIG_DIR, { recursive: true });
+    if (existsSync(ACTIVITY_LOG_PATH) && statSync(ACTIVITY_LOG_PATH).size > ACTIVITY_MAX_BYTES) {
+      renameSync(ACTIVITY_LOG_PATH, `${ACTIVITY_LOG_PATH}.1`);
+    }
+    writeFileSync(ACTIVITY_LOG_PATH, formatActivity(record), { flag: 'a' });
+  } catch {
+    // Logging is a memory aid; it must never turn a successful vault write into a failure.
+  }
+}
+
+export function readActivity({ limit = 50, vault } = {}) {
+  if (!existsSync(ACTIVITY_LOG_PATH)) return [];
+  const records = [];
+  for (const line of readFileSync(ACTIVITY_LOG_PATH, 'utf8').split('\n')) {
+    if (!line.trim()) continue;
+    try {
+      const rec = JSON.parse(line);
+      if (!vault || rec.vault === vault) records.push(rec);
+    } catch {
+      // skip a damaged line rather than failing the whole read
+    }
+  }
+  return records.slice(-limit);
+}
+
 function pluck(obj, dotPath) {
   return dotPath.split('.').reduce((acc, key) => (acc == null ? undefined : acc[key]), obj);
 }
 
 function summary(config) {
   const p = config.profile ?? {};
-  const lines = [
-    `vault:      ${config.vaultName} (${config.vaultPath})`,
-    `setup mode: ${config.setupMode ?? 'unknown'}`,
-    `use cases:  ${(config.useCases ?? []).join(', ') || '(none recorded)'}`,
-    `audience:   ${config.audienceName || config.audienceLabel || '(none)'}`,
-    `sync:       ${config.syncMode ?? 'none'}`,
-    `folders:    ${JSON.stringify(p.folders ?? {})}`,
-    `naming:     ${p.namingStyle ?? '(follow existing notes)'}`,
-    `daily note: ${p.dailyNoteFormat ?? '(discover via daily:path)'}`,
-    `projects:   ${(config.projectRepos ?? []).length} configured`,
-    `shared repo:${config.sharedRepoPath ? ' ' + config.sharedRepoPath : ' (none)'}`,
-  ];
-  return lines.join('\n');
+  return [
+    `vault:       ${config.vaultName} (${config.vaultPath})`,
+    `setup mode:  ${config.setupMode ?? 'unknown'}`,
+    `use cases:   ${(config.useCases ?? []).join(', ') || '(none recorded)'}`,
+    `audience:    ${config.audienceName || config.audienceLabel || '(none)'}`,
+    `sync:        ${config.syncMode ?? 'none'}`,
+    `daily notes: ${p.dailyNotes ?? 'not recorded — treat as none: never call daily:* verbs'}`,
+    `sensitivity: ${p.sensitivityProperty ?? 'sensitivity'} (public | internal | private)`,
+    `folders:     ${JSON.stringify(p.folders ?? {})}`,
+    `naming:      ${p.namingStyle ?? '(follow existing notes)'}`,
+    `projects:    ${(config.projectRepos ?? []).length} configured`,
+    `shared repo: ${config.sharedRepoPath ?? '(none)'}`,
+  ].join('\n');
 }
 
-// CLI entry: `node config.mjs get [dot.path]` / `node config.mjs summary`
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const [, , cmd, key] = process.argv;
-  const config = readConfig();
+  const { status, config, error } = loadConfig();
+  const unavailable = status === 'invalid' ? `INVALID_CONFIG: ${CONFIG_PATH} could not be parsed (${error}). Fix or re-run vault-setup; do not overwrite it blindly.` : 'NOT_CONFIGURED';
   if (cmd === 'get') {
-    if (!config) {
-      console.log('NOT_CONFIGURED');
-    } else if (key) {
+    if (!config) console.log(unavailable);
+    else if (key) {
       const value = pluck(config, key);
-      console.log(value === undefined || value === null ? '' : typeof value === 'object' ? JSON.stringify(value) : value);
-    } else {
-      console.log(JSON.stringify(config, null, 2));
-    }
+      console.log(value == null ? '' : typeof value === 'object' ? JSON.stringify(value) : value);
+    } else console.log(JSON.stringify(config, null, 2));
   } else if (cmd === 'summary') {
-    console.log(config ? summary(config) : 'NOT_CONFIGURED');
+    console.log(config ? summary(config) : unavailable);
   } else {
     console.error('Usage: node config.mjs get [dot.path] | node config.mjs summary');
     process.exitCode = 1;

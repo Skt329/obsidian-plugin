@@ -49,15 +49,17 @@ what window before you pull from it. If nothing is connected, skip this silently
 **(5) The vault itself.** Always worth a pass, and often enough on its own:
 
 ```bash
-node "${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.mjs" daily:path
-node "${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.mjs" daily:read
 node "${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.mjs" tasks status=done
 node "${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.mjs" tasks status=todo
 node "${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.mjs" search:context query="blocked" format=json
 ```
 
-Read the previous working day's daily note (not only today's), plus notes and decisions created or
-edited in the window. Full command catalog: `${CLAUDE_PLUGIN_ROOT}/references/obsidian-cli.md`.
+**Daily notes only if the vault keeps them.** If `profile.dailyNotes` is `"used"`, read the previous
+working day's note with `read path=<that date's note>` (resolve the path with `daily:path` and the
+vault's date format). Never use `daily:read`: it creates today's note as a side effect, and the
+wrapper refuses it unless daily notes are in use. Without daily notes, the vault's own dated log —
+for example a project's updates folder — plays the same role. Either way, also read notes and
+decisions created or edited in the window. Full command catalog: `${CLAUDE_PLUGIN_ROOT}/references/obsidian-cli.md`.
 
 **If nothing is configured beyond the vault and no tools are connected, this still works.** The
 conversation plus the vault is a complete source. Never block on missing integrations, and never
@@ -96,12 +98,16 @@ list, and keep it to three or four lines.
 ## 5. Deliver it
 
 1. Print the update in chat, formatted so the user can copy it straight out.
-2. Append it to today's daily note under a stable `## Standup` heading (use the vault's own heading
-   name if one is already in use there, from the daily note or a template):
-   ```bash
-   node "${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.mjs" daily:append content="..."
-   ```
-   Re-running on the same day updates that section rather than stacking duplicates.
+2. Record it where the vault keeps dated entries:
+   - `profile.dailyNotes` is `"used"` → append to today's daily note under a stable `## Standup`
+     heading (the vault's own heading name if one exists). Write the text to a temp file first and
+     pass it with `content-file=` so nothing is pasted into a shell string:
+     ```bash
+     node "${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.mjs" daily:append content-file=<tmp.md>
+     ```
+   - Otherwise → offer to add it to the vault's own dated log for the relevant project or area, or
+     keep it in chat only. **Never** create a daily note in a vault that does not use them.
+   Re-running on the same day updates that entry rather than stacking duplicates.
 3. If `profile` shows a standup or daily template, apply it through `vault-template` instead of
    inventing a layout.
 

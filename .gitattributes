@@ -1,0 +1,7 @@
+* text=auto eol=lf
+*.zip binary
+
+# Development-only files stay out of the distributed plugin zip.
+test/ export-ignore
+scripts/build.mjs export-ignore
+.gitattributes export-ignore

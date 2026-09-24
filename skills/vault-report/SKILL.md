@@ -92,9 +92,10 @@ untested against production data."
 
 ## 6. Sensitive content
 
-- Exclude notes marked confidential or private — a `confidential`, `private`, or `sensitive` tag or
-  property, or a folder the user has told you to keep out — unless the person explicitly asks for
-  them in this report.
+- Exclude notes marked `sensitivity: private` (or the key named in `profile.sensitivityProperty`;
+  legacy `confidential` / `sensitive` / `private` flags count too), and any folder the user has told
+  you to keep out — unless the person explicitly asks for them in this report. Notes marked
+  `sensitivity: internal` may go to an internal audience but never to an external one.
 - When the audience is external (a client, a customer, anyone outside the user's organisation or
   household) and the draft contains something that reads as internal — a person's performance, an
   unannounced plan, pricing or cost internals, a security issue, a vendor complaint, another

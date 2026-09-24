@@ -49,20 +49,23 @@ function stripNoise(text) {
 
 function findTranscript(projectDir) {
   const dir = path.join(homedir(), '.claude', 'projects', projectSlug(projectDir));
-  if (!existsSync(dir)) return { dir: null, file: null };
-  const wanted = process.env.CLAUDE_SESSION_ID ? `${process.env.CLAUDE_SESSION_ID}.jsonl` : null;
+  if (!existsSync(dir)) return { dir: null, file: null, guessed: false };
+  // Claude Code exposes CLAUDE_CODE_SESSION_ID; the older name is kept as a fallback.
+  const sessionId = process.env.CLAUDE_CODE_SESSION_ID || process.env.CLAUDE_SESSION_ID;
+  const wanted = sessionId ? `${sessionId}.jsonl` : null;
   const files = readdirSync(dir)
     .filter((f) => f.endsWith('.jsonl'))
     .map((f) => path.join(dir, f));
-  if (!files.length) return { dir, file: null };
+  if (!files.length) return { dir, file: null, guessed: false };
   if (wanted) {
     const exact = files.find((f) => path.basename(f) === wanted);
-    if (exact) return { dir, file: exact };
+    if (exact) return { dir, file: exact, guessed: false };
   }
+  // No session id match: the newest transcript is a guess and may belong to another session.
   const newest = files
     .map((f) => ({ f, t: safeMtime(f) }))
     .sort((a, b) => b.t - a.t)[0];
-  return { dir, file: newest?.f ?? null };
+  return { dir, file: newest?.f ?? null, guessed: Boolean(newest) };
 }
 
 function safeMtime(file) {
@@ -155,13 +158,14 @@ function memoryIndex(projectDir) {
 
 export function harvest(projectDir = process.cwd()) {
   const resolved = path.resolve(projectDir);
-  const { dir, file } = findTranscript(resolved);
+  const { dir, file, guessed } = findTranscript(resolved);
   return {
     projectDir: resolved,
     harvestedAt: new Date().toISOString(),
     session: parseTranscript(file),
     transcriptDir: dir,
     transcriptFile: file,
+    transcriptGuessed: guessed,
     git: gitContext(resolved),
     instructionFiles: instructionFiles(resolved),
     memory: memoryIndex(resolved),

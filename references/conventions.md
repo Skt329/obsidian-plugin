@@ -99,7 +99,7 @@ topic: ""           # the project, course, client, or area of life it belongs to
 status: open        # only for things that can be open or closed; omit otherwise
 date: 2026-09-18    # ISO; the day it happened, not the day it was typed
 tags: []
-private: false      # true = never leaves the vault; share/publish skills must honour this
+sensitivity: internal   # public | internal | private — share, report and sync honour this
 ---
 ```
 
@@ -237,7 +237,7 @@ the profile and say what you did.
   exact paths and confirm; `obsidian history:list` and `history:restore` exist, but do not
   rely on them as an undo.
 - **Do not create folders as a side effect.** Ask first, every time.
-- **Do not ignore `private: true`** (or the vault's equivalent flag) when sharing,
+- **Do not ignore `sensitivity: private`** (or the vault's equivalent flag) when sharing,
   exporting, or publishing anything.
 
 ---

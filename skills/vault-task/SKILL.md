@@ -38,8 +38,10 @@ A task filed somewhere the user never opens is a lost task. Pick a home in this 
    `append path=<note> content="- [ ] <task>"`, under the note's existing tasks heading if it has
    one (`outline path=<note>` to check). This covers "add a to-do for the auth rewrite" and
    "add this to the house move note" equally.
-2. **Today's daily note** — for anything tied to today or tomorrow:
-   `daily:append content="- [ ] <task>"`.
+2. **Today's daily note** — for anything tied to today or tomorrow, **only when
+   `profile.dailyNotes` is `"used"`**: `daily:append content="- [ ] <task>"`. In a vault without
+   daily notes, skip this option entirely — the verb would create a stray note, and the wrapper
+   refuses it.
 3. **An inbox note** — when there is no home yet. Use whatever the user already calls it; if
    nothing exists, propose one inside `config.profile.folders.notes` and create it only after
    they agree.

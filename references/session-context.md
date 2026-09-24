@@ -226,7 +226,7 @@ Harvested context is raw. It can contain things that must not be written down.
   words, and personal information about third parties. Include them only when the note's
   purpose actually needs them.
 - When a note does contain something sensitive, flag it to the user before writing and mark
-  the note (a `sensitive: true` property, a tag, or the private folder the user nominated) so
+  the note (a `sensitivity: private` or `internal` property, a tag, or the private folder the user nominated) so
   later sharing steps can filter it.
 - **Assume a note may be shared later.** Reports, standups and exports are built from vault
   notes. What goes in today can leave the vault tomorrow, so write the private aside only

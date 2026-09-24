@@ -17,9 +17,9 @@ Setup **reads and records**. It never modifies, moves, renames or reorganizes an
 
 ## 1. Find out what already exists
 ```
-node "${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.mjs" vaults format=json
+node "${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.mjs" vaults verbose
 ```
-This lists vaults Obsidian already knows about. The CLI talks to the running Obsidian app, so if it errors or hangs, the app is probably closed or still starting — say so and offer to retry rather than guessing.
+This lists vaults Obsidian already knows about, one `name<TAB>path` per line (`vaults` ignores `format=json`, so do not ask for it). The CLI talks to the running Obsidian app, so if it errors or hangs, the app is probably closed or still starting — say so and offer to retry rather than guessing.
 
 Show the real list, then ask which route they want. **Never pick silently, and never touch a vault they did not choose.**
 
@@ -44,12 +44,14 @@ This profile is the contract every other skill follows. So:
 - Only propose creating a folder when the scan shows nothing suitable, and ask before creating it. Propose, do not impose.
 - If the vault has no discernible system at all, say so honestly and offer a light default — still as a suggestion they can decline.
 
-Record all of this under `profile` in the config (folders, namingStyle, dailyNoteFormat, existingTags, existingProperties, hasTemplaterPlugin, hasTasksPlugin) and set `setupMode: "existing"`.
+Record all of this under `profile` in the config (folders, namingStyle, dailyNoteFormat, existingTags, existingProperties, hasTemplaterPlugin, hasTasksPlugin) and set `setupMode: "existing"`. Also record:
+- `dailyNotes`: `"used"` only if the vault genuinely keeps daily notes (files already exist at the `daily:path` pattern), otherwise `"none"`. **Never probe with `daily:read`** — it creates today's note as a side effect. The wrapper refuses every daily verb except `daily:path` unless this is `"used"`.
+- `sensitivityProperty`: the frontmatter key the vault uses for privacy, default `sensitivity` with values `public | internal | private`. If the vault already uses a different key, record that instead.
 
 ## 3. Route c — create a new vault
 1. Confirm the exact parent folder and vault name, then `mkdir -p "<path>"`. Never reuse a path from an earlier conversation.
 2. The CLI has **no create-vault command**. Tell the user to open Obsidian and use **File → Open folder as vault** on that exact path, and wait for them to confirm they have done it.
-3. Verify: re-run `obsidian-cli.mjs vaults format=json` and check the new name and path appear. If not, the likely causes are Obsidian not running or a different folder picked — re-check rather than proceeding on an unverified vault.
+3. Verify: re-run `obsidian-cli.mjs vaults verbose` and check the new name and path appear. If not, the likely causes are Obsidian not running or a different folder picked — re-check rather than proceeding on an unverified vault.
 4. Offer a light starting structure (somewhere for daily notes, longer notes, templates, archive) and let them decline it or rename every folder. Set `setupMode: "new"`.
 
 ## 4. What they will use it for

@@ -58,6 +58,10 @@ personal is ever committed here.
 Not sure what to do with it? Run **`/vault-guide`**. It asks about your
 situation and walks you through a workflow that fits it, with real examples.
 
+📖 **[Read the complete guide](docs/USAGE.md)** — a walkthrough of your first
+fifteen minutes, every skill with example phrases to try, daily and weekly
+rhythms, quickstarts by role, configuration, and troubleshooting.
+
 ## Skills
 
 | Skill | What it does | Say something like |
@@ -91,10 +95,9 @@ name, for example `/vault-review monthly`.
 
 | Hook | What it does |
 |---|---|
-| **SessionStart** | Checks once, early, that your configured vault is actually reachable — so you find out Obsidian is closed before a skill needs it, not during. |
+| **SessionStart** | Silent when your vault is healthy. Speaks up only if the vault was renamed or moved, or Obsidian is running but not answering. Never launches Obsidian. |
 | **SessionEnd** | Reminds you to back up if the vault has uncommitted changes. Read-only. It never commits for you. |
-| **PostToolUse** | Keeps a local log of vault changes, which later helps write an accurate commit message or summary. Informational only. |
-| **PreToolUse** | Blocks any raw push of your vault that did not go through the reviewed sync or share flow. |
+| **PreToolUse** | Stops an accidental push of your vault or shared repo that skipped the reviewed sync or share flow (Bash and PowerShell). |
 
 ## How it uses context
 
@@ -125,11 +128,11 @@ you what it could not find and asks.
 - **Nothing leaves your vault without your explicit say-so.** Every push, pull
   request, export or publish shows you exactly what will happen first and waits
   for confirmation. There is no unattended auto-send anywhere in this plugin.
-- **A hook blocks unreviewed pushes**, so a stray command cannot bypass that
+- **A hook stops accidental unreviewed pushes.** It is a guard rail, not a lock — Claude Code's own permission prompt, which asks before every push, is the real safeguard. The hook catches a stray command so it cannot slip past that
   review.
 - **Git repositories default to private.** The plugin never changes a
   repository's visibility on its own.
-- **Notes can be marked sensitive** in their frontmatter; those are excluded
+- **Notes can be marked `sensitivity: private`** (or `internal`) in their frontmatter; private notes are excluded
   from anything that shares or exports.
 - **No messaging integration is wired up.** A standup or report is text handed
   back to you — you decide where it goes.

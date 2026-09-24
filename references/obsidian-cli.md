@@ -174,7 +174,7 @@ already uses with `tasks format=json` before introducing a new character.
 |---|---|---|
 | `daily` | Open today's daily note (creating it if needed) | `paneType=tab\|split\|window` |
 | `daily:path` | Print the path of today's daily note | — |
-| `daily:read` | Read today's daily note | — |
+| `daily:read` | Read today's daily note — **creates it if missing**, so never use it as a read-only check | — |
 | `daily:append` | Append to today's daily note | `content=` (required), `inline`, `open` |
 | `daily:prepend` | Prepend to today's daily note | `content=` (required), `inline`, `open` |
 
@@ -573,11 +573,14 @@ default. The wrapper's `runObsidianJson` helper appends `format=json` and parses
 
 | Symptom | Likely cause | Response |
 |---|---|---|
+| `Error: …` printed, exit 0 | The CLI reports failures on stdout with a success exit code | The wrapper turns these into exit 1 with the message on stderr — trust the wrapper's exit code. |
+| `No … found.` printed | An empty result, even when JSON was requested | The wrapper returns it as an empty result, not text to parse. |
 | Call times out at 20s | Obsidian is starting up, updating, or re-indexing | Tell the user to bring Obsidian to the foreground and wait; retry once. Do not loop. |
 | Empty output, exit 0 | The command genuinely found nothing, or the feature is not configured | Distinguish with a `total` call or by checking the relevant plugin is enabled. |
 | `Error: No template folder configured.` | Core Templates plugin has no folder set | Continue without a template; offer to help set one up. |
 | `daily:*` fails | Daily Notes core plugin disabled | Build the path yourself from `config.profile`, or ask the user to enable it. |
-| Wrong vault touched | `vault=` was missing | Always go through the wrapper, which injects it. |
+| Wrong vault touched | `vault=` was missing, or named a vault that does not exist — an unknown name silently falls back to the active vault | Always go through the wrapper: it injects `vault=` and verifies the vault path before the first write, refusing on a mismatch. |
+| `daily:*` refused by the wrapper | The vault is not recorded as using daily notes (`profile.dailyNotes`) | Use the vault's own dated log instead, or set `dailyNotes: "used"` via vault-setup if it really keeps daily notes. |
 | `file=` hit the wrong note | Two notes share a name | Re-run with `path=` and the exact path from `files`. |
 | Task update hit the wrong line | Cached line number went stale | Re-run `tasks format=json` and re-resolve before every mutation. |
 

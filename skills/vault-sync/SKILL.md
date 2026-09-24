@@ -39,8 +39,9 @@ Both read-only. If the tree is clean, say everything is already committed and st
 
 Read the changed notes and look for:
 
-- **Notes marked confidential** — `confidential: true` or the vault's own private property (check
-  `config.profile.existingProperties`) heading for a remote. Usually unintentional.
+- **Notes marked private** — `sensitivity: private` (or the key named in
+  `profile.sensitivityProperty`; legacy `confidential: true` / `sensitive: true` count too) heading
+  for a remote. Usually unintentional — show the file and ask before staging it.
 - **Secret-shaped strings** — keys, tokens, passwords, recovery codes, card numbers pasted into a
   note. Journals and reference notes collect these more often than work notes do.
 - **Obsidian UI churn** — `.obsidian/workspace*.json` records which panes were open, not content.

@@ -35,7 +35,8 @@ were tried and abandoned, which is the part that costs the most to rediscover.
 - **vault-diagram** — a sequence or flow diagram when prose stops being enough to explain a data path.
 - **vault-standup** — reconstruct yesterday from real activity instead of memory.
 
-**Templates worth installing:** `decision-record`, `debug-log`, `runbook`, `daily-note`, `project-brief`.
+**Templates from the starter library:** `decision`, `runbook`, `project-brief`, `daily-note`.
+**Worth building yourself** with vault-template: debug log, incident note.
 
 **A week in the life.** Morning: vault-standup rebuilds yesterday from commits and open tasks. During
 work: vault-capture for stray observations; vault-decision the moment an argument about approach
@@ -67,8 +68,8 @@ delivery picture they can report upward without doing archaeology first.
 - **vault-review** — weekly on delivery, monthly on people.
 - **vault-task** — commitments made *to* people, which are the easiest to drop and the worst to drop.
 
-**Templates worth installing:** `one-on-one`, `person-note`, `team-update`, `decision-record`,
-`weekly-review`.
+**Templates from the starter library:** `one-on-one`, `person`, `decision`, `weekly-review`.
+**Worth building yourself** with vault-template: team update.
 
 **A week in the life.** As things happen: a line into the relevant person's note — a good call they made,
 a concern, something they asked for. Before each 1:1: reread that person's last two notes, so the
@@ -105,8 +106,8 @@ in a meeting.
 - **vault-report** — the same week, retold for a different audience at a different altitude.
 - **vault-capture** — customer or stakeholder quotes, verbatim, before they get paraphrased into mush.
 
-**Templates worth installing:** `decision-record`, `project-brief`, `meeting-note`, `stakeholder-update`,
-`customer-feedback`.
+**Templates from the starter library:** `decision`, `project-brief`, `meeting-note`.
+**Worth building yourself** with vault-template: stakeholder update, customer feedback.
 
 **A week in the life.** During meetings: vault-capture for decisions and verbatim quotes. After anything
 contested: vault-decision, while people still remember their own reasoning. When a doc is requested:
@@ -138,8 +139,8 @@ screenshot happens to look like.
   every time.
 - **vault-review** — monthly pass over `Inspiration/`, promoting what actually gets reused into `Patterns/`.
 
-**Templates worth installing:** `design-critique`, `decision-record`, `project-brief`, `user-flow`,
-`research-synthesis`.
+**Templates from the starter library:** `decision`, `project-brief`, `meeting-note`.
+**Worth building yourself** with vault-template: design critique, user flow.
 
 **A week in the life.** Ongoing: references and screenshots captured with a sentence each. After a
 critique: the critique note, separating what was asked for from what was actually said. When a direction
@@ -169,8 +170,8 @@ writing later, with provenance solid enough to cite without reopening the PDF.
 - **vault-doc** — synthesis: pull every note linked to one claim and draft the section.
 - **vault-review** — monthly consolidation, which is where a literature pile turns into an argument.
 
-**Templates worth installing:** `source-note`, `literature-review`, `experiment-log`,
-`research-synthesis`, `idea-note`.
+**Templates from the starter library:** `reading-note`, `idea`, `project-brief`.
+**Worth building yourself** with vault-template: source note, literature review, experiment log.
 
 **A week in the life.** Reading: one source note per source, in the same shape every time, each ending
 with "what this changes for my argument." Thinking: idea notes that link to sources, not the reverse.
@@ -202,8 +203,8 @@ against*, not to be complete. Completeness is the failure mode, not the goal.
 - **vault-ops** — search across courses; the overlaps between two courses are where the exam questions
   live.
 
-**Templates worth installing:** `lecture-note`, `reading-note`, `assignment-tracker`, `exam-prep`,
-`concept-note`.
+**Templates from the starter library:** `reading-note`, `daily-note`, `goal`.
+**Worth building yourself** with vault-template: lecture note, assignment tracker, exam prep.
 
 **A week in the life.** In class: capture roughly; do not beautify. Same evening (10 minutes): clean up,
 and write three questions the note should be able to answer. Weekly: attempt those questions cold, then
@@ -234,8 +235,8 @@ anything, and research that can be reused across pieces instead of re-gathered e
   either work or a burial.
 - **vault-share** — export a finished draft out to wherever it actually gets published.
 
-**Templates worth installing:** `content-brief`, `idea-note`, `interview-note`, `research-note`,
-`publishing-checklist`.
+**Templates from the starter library:** `idea`, `reading-note`, `project-brief`.
+**Worth building yourself** with vault-template: content brief, interview note, publishing checklist.
 
 **A week in the life.** Daily: fragments in, no editing. Weekly: promote two or three fragments to ideas,
 one idea to a brief. Drafting happens in the vault or elsewhere — either is fine, but status lives in the
@@ -267,8 +268,8 @@ theirs.
 - **vault-review** — weekly. For a founder this is often the only structural pause that exists at all.
 - **vault-task** — obligations that have consequences: filings, renewals, promises to customers.
 
-**Templates worth installing:** `decision-record`, `customer-feedback`, `investor-update`,
-`weekly-review`, `meeting-note`.
+**Templates from the starter library:** `decision`, `weekly-review`, `meeting-note`, `goal`.
+**Worth building yourself** with vault-template: customer feedback, investor update.
 
 **A week in the life.** All week: capture — customer calls, competitor moves, half-ideas, worries. Before
 anything irreversible: vault-decision, ten minutes, with the assumption that would have to be false for
@@ -303,8 +304,8 @@ document.
 - **vault-share** — send deliverables out, with a check first that nothing from another engagement came
   along.
 
-**Templates worth installing:** `client-brief`, `engagement-log`, `meeting-note`, `deliverable-note`,
-`invoice-summary`.
+**Templates from the starter library:** `meeting-note`, `project-brief`, `person`.
+**Worth building yourself** with vault-template: client brief, engagement log, invoice summary.
 
 **A week in the life.** Starting a client block: open that client's brief and its last re-entry note —
 this is the whole trick. Ending a block: three lines — where I stopped, next action, what I am waiting on
@@ -341,8 +342,8 @@ a place to think that is not a phone notes app with 400 untitled entries.
 - **vault-review** — monthly rather than weekly. Personal life has a slower cadence, and weekly review
   here usually collapses within a month.
 
-**Templates worth installing:** `daily-journal`, `trip-plan`, `health-log`, `decision-record`,
-`home-record`, `habit-tracker`.
+**Templates from the starter library:** `daily-note`, `decision`, `goal`, `weekly-review`.
+**Worth building yourself** with vault-template: trip plan, health log, habit tracker.
 
 **A week in the life.** Evening: three lines in the journal, attached to something that already happens —
 after dinner, before bed. As they occur: errands and renewals as tasks. When something official arrives:
