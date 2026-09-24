@@ -15,12 +15,81 @@ export const CONFIG_PATH = path.join(CONFIG_DIR, 'config.json');
 export const ACTIVITY_LOG_PATH = path.join(CONFIG_DIR, 'activity.jsonl');
 const ACTIVITY_MAX_BYTES = 1024 * 1024;
 
+// Profile schema v2 (0.3.0) adds structured "kinds" (a folder + naming + template + lifecycle
+// contract for one sort of note) and "projects" (a hub note plus named sections, each pointing at
+// a kind) — the vault's own organizing pattern as data, instead of the free-text prose v1 recorded
+// it as. A v1 profile is migrated automatically and losslessly: every old field is kept, the prose
+// moves to `legacyNotes` untouched, and `kinds`/`projects` start empty until vault-setup or
+// vault-profile's detector populates them. Nothing is ever silently overwritten.
+export const PROFILE_SCHEMA_VERSION = 2;
+
+export function migrateProfile(profile) {
+  if (!profile) return { schemaVersion: PROFILE_SCHEMA_VERSION, kinds: {}, projects: [] };
+  if ((profile.schemaVersion ?? 1) >= PROFILE_SCHEMA_VERSION) return profile;
+
+  const { productTemplate, ...restFolders } = profile.folders ?? {};
+  const legacyNotes = { ...(profile.legacyNotes ?? {}) };
+  if (productTemplate) legacyNotes.folderPatternProse = productTemplate;
+  if (profile.propertyNotes) legacyNotes.propertyNotes = profile.propertyNotes;
+
+  const { propertyNotes: _drop, ...rest } = profile;
+  return {
+    ...rest,
+    folders: restFolders,
+    schemaVersion: PROFILE_SCHEMA_VERSION,
+    kinds: profile.kinds ?? {},
+    projects: profile.projects ?? [],
+    ...(Object.keys(legacyNotes).length ? { legacyNotes } : {}),
+  };
+}
+
+function migrateConfig(config) {
+  if (!config?.profile) return config;
+  const profile = migrateProfile(config.profile);
+  return profile === config.profile ? config : { ...config, profile };
+}
+
+// A note kind's lifecycle shapes how skills treat it: appendOnly notes (an updates log) are never
+// marked open/closed and are always added to, never edited in place; openClosed notes (decisions,
+// tasks) carry a status that changes over time; reference notes (documentation) are edited in
+// place and have no status at all.
+export const LIFECYCLES = new Set(['appendOnly', 'openClosed', 'reference']);
+
+// Structural sanity only — never blocks normal use, just tells vault-setup/tests when a proposed
+// or hand-edited profile doesn't hang together (e.g. a project section pointing at a kind that
+// was never defined).
+export function validateProfile(profile) {
+  const problems = [];
+  if (!profile) return problems;
+  const kinds = profile.kinds ?? {};
+  for (const [id, kind] of Object.entries(kinds)) {
+    if (!kind.folder) problems.push(`kind "${id}" has no folder`);
+    if (kind.lifecycle && !LIFECYCLES.has(kind.lifecycle)) problems.push(`kind "${id}" has an unknown lifecycle "${kind.lifecycle}"`);
+  }
+  for (const project of profile.projects ?? []) {
+    if (!project.name || !project.root) problems.push(`a project is missing name/root: ${JSON.stringify(project)}`);
+    for (const [section, kindId] of Object.entries(project.sections ?? {})) {
+      if (!kinds[kindId]) problems.push(`project "${project.name}" section "${section}" points at undefined kind "${kindId}"`);
+    }
+  }
+  return problems;
+}
+
 // Distinguishes "no config" from "config exists but is broken". Treating both as
 // unconfigured made setup overwrite a damaged profile and silently disabled the push guard.
 export function loadConfig() {
   if (!existsSync(CONFIG_PATH)) return { status: 'missing', config: null, error: null };
   try {
-    return { status: 'ok', config: JSON.parse(readFileSync(CONFIG_PATH, 'utf8')), error: null };
+    const raw = JSON.parse(readFileSync(CONFIG_PATH, 'utf8'));
+    const migrated = migrateConfig(raw);
+    if (migrated !== raw) {
+      try {
+        writeConfig(migrated);
+      } catch {
+        // migration still applies in-memory for this run even if the write-back fails
+      }
+    }
+    return { status: 'ok', config: migrated, error: null };
   } catch (err) {
     return { status: 'invalid', config: null, error: err.message };
   }
@@ -74,18 +143,22 @@ function pluck(obj, dotPath) {
 
 function summary(config) {
   const p = config.profile ?? {};
+  const projects = p.projects ?? [];
+  const kinds = Object.keys(p.kinds ?? {});
   return [
-    `vault:       ${config.vaultName} (${config.vaultPath})`,
-    `setup mode:  ${config.setupMode ?? 'unknown'}`,
-    `use cases:   ${(config.useCases ?? []).join(', ') || '(none recorded)'}`,
-    `audience:    ${config.audienceName || config.audienceLabel || '(none)'}`,
-    `sync:        ${config.syncMode ?? 'none'}`,
-    `daily notes: ${p.dailyNotes ?? 'not recorded — treat as none: never call daily:* verbs'}`,
-    `sensitivity: ${p.sensitivityProperty ?? 'sensitivity'} (public | internal | private)`,
-    `folders:     ${JSON.stringify(p.folders ?? {})}`,
-    `naming:      ${p.namingStyle ?? '(follow existing notes)'}`,
-    `projects:    ${(config.projectRepos ?? []).length} configured`,
-    `shared repo: ${config.sharedRepoPath ?? '(none)'}`,
+    `vault:         ${config.vaultName} (${config.vaultPath})`,
+    `setup mode:    ${config.setupMode ?? 'unknown'}`,
+    `use cases:     ${(config.useCases ?? []).join(', ') || '(none recorded)'}`,
+    `audience:      ${config.audienceName || config.audienceLabel || '(none)'}`,
+    `sync:          ${config.syncMode ?? 'none'}`,
+    `daily notes:   ${p.dailyNotes ?? 'not recorded — treat as none: never call daily:* verbs'}`,
+    `sensitivity:   ${p.sensitivityProperty ?? 'sensitivity'} (public | internal | private)`,
+    `folders:       ${JSON.stringify(p.folders ?? {})}`,
+    `naming:        ${p.namingStyle ?? '(follow existing notes)'}`,
+    `note kinds:    ${kinds.length ? kinds.join(', ') : '(none recorded — run vault-project or vault-setup to detect them)'}`,
+    `vault projects:${projects.length ? ' ' + projects.map((pr) => pr.name).join(', ') : ' (none recorded)'}`,
+    `tracked repos: ${(config.projectRepos ?? []).length} configured (for standup/report activity)`,
+    `shared repo:   ${config.sharedRepoPath ?? '(none)'}`,
   ].join('\n');
 }
 

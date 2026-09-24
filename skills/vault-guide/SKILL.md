@@ -26,6 +26,7 @@ If a `[topic]` argument was passed (e.g. `journaling`, `templates`, `standup`, `
 |---|---|---|
 | **vault-guide** | This. Orientation, help, personalized workflow | "how do I use this", "how do I do X with my notes" |
 | **vault-setup** | Attach to an existing vault, or create a new one; saves config | "set this up", "connect my vault" |
+| **vault-project** | Start a new project set up the way an existing one already is — a hub note plus sections like Documentation, Updates, Decisions | "start a new project like PlayDen" |
 | **vault-ops** | Read, search, browse, edit anything; the shared conventions reference | "find my notes on X", "what's in my vault about Y" |
 | **vault-capture** | Fast inbox capture — idea, link, quote, errand, thought | "jot this down", "save this for later" |
 | **vault-template** | Build and apply reusable templates for your own recurring notes | "make a template for client calls", "apply my meeting template" |

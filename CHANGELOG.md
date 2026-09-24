@@ -1,5 +1,44 @@
 # Changelog
 
+## 0.3.0 — learns your project structure
+
+### Added
+- **Profile schema v2.** `profile.kinds` (a folder + naming + template + lifecycle contract for
+  one sort of note — an append-only log, an open/closed record, stable reference material) and
+  `profile.projects` (a hub note plus named sections, each pointing at a kind) represent a vault's
+  own organizing pattern as structured data instead of free-text prose. A v1 config is migrated
+  automatically and losslessly the next time it is read: every field is kept, and the old prose
+  moves untouched into `profile.legacyNotes`. Verified live on the real `workspace` vault.
+- **`scripts/vault-profile.mjs` detects existing projects.** Given the vault's real file list, it
+  finds folders shaped like a project (a hub note and/or several recognizable sections —
+  Documentation, Updates, Decisions, Ideas, Meetings, Tasks — under aliases so a vault calling
+  Updates "Journal" still matches) and proposes `projects`/`kinds` entries. It is a proposal only;
+  nothing is written to config until a skill shows it to the user and they confirm. Verified live:
+  correctly found both real projects in the test vault, including a `Meetings` section the old
+  free-text profile had already drifted away from recording.
+- **`vault-project` skill** and **`scripts/scaffold.mjs`**: start a new project set up the way an
+  existing one already is. Clones a named project's own recorded sections and kinds (never the
+  vault-wide merged pool, since two projects may spell a section differently), previews every file
+  it would create (`scaffold.mjs plan`) before creating anything (`scaffold.mjs run`), and never
+  overwrites an existing file. Live-tested end to end against the real vault: created, verified,
+  re-ran to confirm idempotency (skips rather than overwrites), then cleaned up. That test also
+  surfaced a real Obsidian CLI limitation, now documented in the skill: deleting the last file in a
+  folder does not remove the now-empty folder from disk — there is no matching `rmdir`.
+- **`scripts/scan-sensitive.mjs`**: a deterministic regex backstop (credential- and PII-shaped
+  strings — AWS/GitHub/Slack/Google keys, private key blocks, JWTs, card numbers, emails) run
+  alongside the model's own read-through in `vault-sync` before a commit and `vault-share` before
+  an export or PR. It never blocks or approves anything by itself — every finding is shown to the
+  user, since it also produces false positives.
+- `vault-decision`, `vault-doc` and `vault-standup` now route into a recorded project's own
+  section (its `decisions`/`documentation`/`updates` kind) when the work belongs to one, and
+  `vault-decision`/`vault-doc` offer — never impose — to add a link from the project's hub note
+  after writing.
+
+### Known and deliberately deferred
+- Subagent MCP tool access (`context-harvester`/`activity-collector` are told to use connected
+  tools but their tool allowlists don't include any), a shared preamble reference to cut the
+  per-skill boilerplate, and the lint/eval suite from the original roadmap are not in this release.
+
 ## 0.2.1 — reliability patch
 
 Everything here was found by using 0.2.0 on a real vault. No new features.

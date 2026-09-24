@@ -91,9 +91,15 @@ future searches and both copies rot.
 
 ## 6. Place, link, and make it findable
 
-- Run `node "${CLAUDE_PLUGIN_ROOT}/scripts/vault-profile.mjs" scan` and read `profile.folders` from
-  config. Put the note where this vault already keeps such notes. Propose a new folder only if
-  nothing fits, and get agreement — an existing vault with its own system is the normal case.
+- **If this documents a recorded project** (check `profile.projects` for a name match, or ask): put
+  it in that project's `documentation` section — the folder whose entry in `project.sections` is
+  `"documentation"` — matching `profile.kinds.documentation.naming`. This is what keeps a project's
+  reference material together instead of scattering it at the vault root.
+- **Otherwise**, run `node "${CLAUDE_PLUGIN_ROOT}/scripts/vault-profile.mjs" scan` and read
+  `profile.folders` from config. Put the note where this vault already keeps such notes. Propose a
+  new folder only if nothing fits, and get agreement — an existing vault with its own system is the
+  normal case. If the scan's `detectedProjects` shows a pattern `profile.projects` hasn't recorded
+  yet, mention that `vault-project` can record it for next time.
 - Match the vault's existing naming style and frontmatter conventions
   (`${CLAUDE_PLUGIN_ROOT}/references/conventions.md`). Reuse tags and properties already in the
   vault rather than minting near-duplicates.
@@ -101,7 +107,9 @@ future searches and both copies rot.
   section 3, `topic`, `status`, `created` and `updated` dates, `tags`, and a `source` line saying
   where the material came from (session, repository and commit, a connected tool).
 - Link it with `[[wikilinks]]` to related notes and to the project or area note if one exists, and
-  add a link back from that note so the doc is reachable. Check with `backlinks` after writing.
+  add a link back from that note so the doc is reachable. Check with `backlinks` after writing. If
+  the project has a `hub` note, offer (don't do it unasked) to add one line linking the new page —
+  same as vault-decision does for decisions.
 - If the vault has a template for this shape, apply it via the `vault-template` skill instead of
   inventing a layout. If the user wants this shape reusable, offer to turn it into a template.
 

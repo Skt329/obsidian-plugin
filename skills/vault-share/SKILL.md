@@ -47,7 +47,18 @@ Check the privacy property — `sensitivity` unless `profile.sensitivityProperty
 A refusal here is correct behaviour, not an obstacle to route around.
 
 ## 4. Mandatory review — nothing leaves the vault before this
-This runs for **both** modes, every time, including for notes that look harmless. Read the text and flag:
+This runs for **both** modes, every time, including for notes that look harmless.
+
+Back your own read-through with the deterministic scanner first — it catches credential- and
+PII-shaped strings a careful read can still miss, though it is a backstop, not the review itself:
+
+```
+node "${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.mjs" read file="Path/To/Note.md" | node "${CLAUDE_PLUGIN_ROOT}/scripts/scan-sensitive.mjs"
+```
+
+Show every finding alongside your own read, even ones that look like false positives (an email in
+a meeting note is often fine to share) — the person deciding is the user, not the scanner. Then
+read the text yourself and flag:
 
 - **People** — colleagues, clients, patients, students, family, anyone named who did not agree to be in a shared document
 - **Organization identifiers** — employer, client, school, vendor names; internal codenames; ticket or account numbers

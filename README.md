@@ -68,6 +68,7 @@ rhythms, quickstarts by role, configuration, and troubleshooting.
 |---|---|---|
 | `vault-guide` | Explains how to use the plugin for *your* role and life, and sets up a personal workflow. | "how do I use this as a student?" |
 | `vault-setup` | Attaches to an existing vault or creates a new one; detects your conventions. | "connect my vault" |
+| `vault-project` | Starts a new project set up the way an existing one already is: a hub note plus sections like Documentation, Updates, Decisions. | "start a new project like PlayDen" |
 | `vault-ops` | General reading, searching, organizing and editing. The fallback for anything not covered below. | "find my notes about the API redesign" |
 | `vault-capture` | Fast capture — an idea, meeting note, link, book note, person, journal entry — filed in the right place. | "capture this: …" |
 | `vault-template` | Create, edit, list and apply your own note templates; install a starter library. | "make me a template for client calls" |

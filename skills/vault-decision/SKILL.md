@@ -68,10 +68,19 @@ For personal decisions add two more, because they are what make an old decision 
 
 ## 5. Write it
 
-Follow the vault's existing structure — check `config.profile.folders` and, when unsure, run
-`node "${CLAUDE_PLUGIN_ROOT}/scripts/vault-profile.mjs" scan` to see where similar notes already
-live and how they are named. Propose a new folder only when nothing fits, and say why first.
-If the vault has a decision template, prefer it (`template:read`, then vault-template).
+**If the decision belongs to a recorded project** — check `profile.projects` for one whose name
+matches the conversation (or ask, if more than one plausibly fits) — write into that project's
+`decisions` section (`project.sections` maps a folder name to a kind id; the folder holding
+`"decisions"` as its value is where this goes), matching that kind's recorded `naming` pattern
+(`profile.kinds.decisions.naming`, e.g. dated filenames). This is what makes the note show up in
+that project's own history instead of scattered at the vault root.
+
+**Otherwise** follow the vault's general structure — check `config.profile.folders` and, when
+unsure, run `node "${CLAUDE_PLUGIN_ROOT}/scripts/vault-profile.mjs" scan` to see where similar
+notes already live and how they are named (its `detectedProjects` may find a pattern
+`profile.projects` hasn't recorded yet — if so, mention `vault-project` can record it). Propose a
+new folder only when nothing fits, and say why first. If the vault has a decision template, prefer
+it (`template:read`, then vault-template).
 
 Suggested frontmatter, matched to keys the vault already uses (`properties`, `tags`):
 
@@ -117,7 +126,15 @@ may circulate inside a team but no further. vault-share hard-stops on `private` 
 `internal`. When in doubt, mark it and say you did. (If `profile.sensitivityProperty` names a
 different key, use that key.)
 
-## 9. Close the loop
+## 9. Update the project hub, if there is one
+
+When the decision landed inside a recorded project (step 5) and that project has a `hub` note,
+offer — do not do it unasked — to add a line linking the new decision from the hub, the same way
+the hub already links its other sections. Show the exact line before appending it. Skip this for a
+vault-root decision with no project, and skip it if the hub already looks hand-curated in a way
+your one line would clutter (many short unlinked items vs a few careful ones) — ask instead.
+
+## 10. Close the loop
 
 Show the finished note, confirm the path, and offer the natural next step: a related task
 (vault-task), a diagram if the decision has shape (vault-diagram), or committing it (vault-sync).

@@ -105,8 +105,12 @@ list, and keep it to three or four lines.
      ```bash
      node "${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.mjs" daily:append content-file=<tmp.md>
      ```
-   - Otherwise → offer to add it to the vault's own dated log for the relevant project or area, or
-     keep it in chat only. **Never** create a daily note in a vault that does not use them.
+   - Otherwise → if the standup is mostly about one recorded project (check `profile.projects`),
+     offer to append a dated entry to that project's `updates` section — the folder whose
+     `project.sections` entry is `"updates"`, named per `profile.kinds.updates.naming` (this is an
+     `appendOnly` kind: add an entry, never edit a past one). If the day spanned several projects,
+     or none are recorded, keep it in chat only rather than guessing which log it belongs in.
+     **Never** create a daily note in a vault that does not use them.
    Re-running on the same day updates that entry rather than stacking duplicates.
 3. If `profile` shows a standup or daily template, apply it through `vault-template` instead of
    inventing a layout.

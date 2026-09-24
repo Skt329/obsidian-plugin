@@ -43,7 +43,14 @@ Read the changed notes and look for:
   `profile.sensitivityProperty`; legacy `confidential: true` / `sensitive: true` count too) heading
   for a remote. Usually unintentional — show the file and ask before staging it.
 - **Secret-shaped strings** — keys, tokens, passwords, recovery codes, card numbers pasted into a
-  note. Journals and reference notes collect these more often than work notes do.
+  note. Journals and reference notes collect these more often than work notes do. Back your own
+  read-through with the deterministic scanner, which catches what a quick read can miss:
+  ```
+  node "${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.mjs" read path=<changed note> | node "${CLAUDE_PLUGIN_ROOT}/scripts/scan-sensitive.mjs"
+  ```
+  Run it on every changed note before staging. It is a backstop, not a filter — it will miss things
+  a human reader catches and occasionally flags something harmless (an email in a meeting note is
+  often fine); show every finding to the user rather than deciding for them.
 - **Obsidian UI churn** — `.obsidian/workspace*.json` records which panes were open, not content.
   It should already be gitignored; if it appears, flag the noise.
 

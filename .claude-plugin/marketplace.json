@@ -10,7 +10,7 @@
       "displayName": "Obsidian Vault Copilot",
       "source": "./",
       "description": "Notes, tasks, decisions, documentation, standups, reports, reviews, diagrams and templates in your Obsidian vault — works with the vault you already have.",
-      "version": "0.2.1",
+      "version": "0.3.0",
       "license": "MIT"
     }
   ]
